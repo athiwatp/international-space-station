@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        #map {
+            height: 100%;
+            width: 100%;
+            left: 0;
+            position: absolute;
+            top: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAW6fWCId9B2KfTiSSp6WWKkfcox0Li3aE"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+        var marker;
+        var map;
+        initMap();
+
+        function initMap() {
+            axios.get('http://api.open-notify.org/iss-now.json').then(function (response) {
+                var coords = response.data.iss_position
+                var position = {
+                    lat: parseFloat(coords.latitude),
+                    lng: parseFloat(coords.longitude)
+                }
+                map = new google.maps.Map(document.getElementById('map'), {
+                    zoom: 3,
+                    center: position,
+                    title: 'International Space Station',
+                    styles: [{"featureType":"all","elementType":"all","stylers":[{"invert_lightness":true},{"saturation":10},{"lightness":30},{"gamma":0.5},{"hue":"#435158"}]}]
+                });
+                marker = new google.maps.Marker({
+                    position: position,
+                    map: map,
+                    icon: 'ISSIcon.png'
+                });
+            })
+        }
+
+        function loadPosition() {
+            axios.get('http://api.open-notify.org/iss-now.json').then(function (response) {
+                var coords = response.data.iss_position
+                var newPosition = new google.maps.LatLng(parseFloat(coords.latitude), parseFloat(coords.longitude));
+                marker.setPosition(newPosition);
+                map.setCenter(newPosition);
+                console.log(coords)
+            })
+        }
+
+        setInterval(function () {
+            loadPosition()
+        }, 2000)
+    </script>
+</body>
+
+</html>

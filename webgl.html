@@ -1,0 +1,73 @@
+Satellite Hello world Animation Custom map tiles TileJSON Overlays Two layers Markers Polygon Globe 2D next to 3D Opposite
+Side of the World Advanced API demo Download & offline demo Project page & API reference WebGLEarth logo Markers Leaflet
+compatible API (replace "L." with "WE.")View example on a separate page Custom markers on globe. Copy Source code
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    >
+    <style>
+        html,
+        body {
+            padding: 0;
+            margin: 0;
+            background-color: black;
+        }
+        
+        #earth_div {
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            position: absolute !important;
+        }
+    </style>
+    <title>WebGL Earth API: Markers</title>
+</head>
+
+<body>
+    <div id="earth_div"></div>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="http://www.webglearth.com/v2/api.js"></script>
+    <script>
+        initialize();
+        var marker;
+
+        function initialize() {
+            axios.get('http://api.open-notify.org/iss-now.json').then(function (response) {
+                var coords = response.data.iss_position;
+                var lat = parseFloat(coords.latitude);
+                var long = parseFloat(coords.longitude);
+                var earth = new WE.map('earth_div', {
+                    center: [lat, long],
+                    sky: true,
+                    atmosphere: true,
+                    zoom: 4
+                });
+                WE.tileLayer('http://tileserver.maptiler.com/nasa/{z}/{x}/{y}.jpg', {
+                    minZoom: 0,
+                    maxZoom: 5,
+                    attribution: 'NASA'
+                }).addTo(earth);
+                marker = WE.marker([lat, long], 'ISSIcon.png', 50, 30).addTo(earth);
+            })
+
+        }
+
+        function updateLocation() {
+            axios.get('http://api.open-notify.org/iss-now.json').then(function (response) {
+                var coords = response.data.iss_position;
+                var lat = parseFloat(coords.latitude);
+                var long = parseFloat(coords.longitude);
+                console.log(lat, long)
+                marker.setLatLng([lat, long]);
+            })
+        }
+
+        setInterval(function () {
+            updateLocation();
+        }, 1000)
+    </script>
+</body>
+
+</html>
